@@ -24,6 +24,36 @@ extension Double {
     }
 }
 
+enum Genre: String, CaseIterable, Identifiable {
+    case none = "Choose Genre"
+    case action = "Action"
+    case adventure = "Adventure"
+    case comedy = "Comedy"
+    case thriller = "Thriller"
+    case horror = "Horror"
+    case drama = "Drama"
+    case sciFi = "Sci-Fi"
+    case fantasy = "Fantasy"
+    case romance = "Romance"
+    
+    var id: String { self.rawValue }
+    
+    var iconName: String {
+        switch self {
+        case .none: return "questionmark.circle"
+        case .action: return "bolt.fill"
+        case .adventure: return "sailboat.fill"
+        case .comedy: return "theatermasks.fill"
+        case .thriller: return "waveform.path.ecg.rectangle.fill"
+        case .horror: return "moon.fill"
+        case .drama: return "theatermasks"
+        case .sciFi: return "atom"
+        case .fantasy: return "wand.and.stars"
+        case .romance: return "heart.fill"
+        }
+    }
+}
+
 struct MovieDetailView: View {
     
     let movie: Movie
@@ -248,12 +278,11 @@ struct AddMovieView: View {
     @Binding var isPresented: Bool
     
     @State private var title = ""
-    @State private var genre = ""
+    @State private var selectedGenre: Genre = .none
     @State private var rating: Double = 5.0
     @State private var year = ""
     @State private var description = ""
     @State private var director = ""
-    @State private var iconName = "film.fill"
     
     var body: some View {
         NavigationStack {
@@ -271,12 +300,23 @@ struct AddMovieView: View {
                 Form {
                 Section {
                     TextField("Title", text: $title)
-                    TextField("Genre", text: $genre)
                     TextField("Year", text: $year)
                     TextField("Director", text: $director)
                 }  header: {
                     Text("Movie Information")
                         .foregroundStyle(.white)
+                }
+                
+                Picker(selection: $selectedGenre) {
+                    ForEach(Genre.allCases.filter { $0 != .none }) { genreOption in
+                        HStack {
+                            Image(systemName: genreOption.iconName)
+                            Text(genreOption.rawValue)
+                        }
+                        .tag(genreOption)
+                    }
+                } label: {
+                    Text("Genre")
                 }
                 
                 Section {
@@ -306,7 +346,7 @@ struct AddMovieView: View {
                     Button("Add") {
                         addMovie()
                     }
-                    .disabled(title.isEmpty)
+                    .disabled(title.isEmpty || selectedGenre == .none || description.isEmpty)
                 
                 }
             
@@ -317,12 +357,12 @@ struct AddMovieView: View {
     func addMovie() {
         let newMovie = Movie(
             title: title,
-            genre: genre,
+            genre: selectedGenre.rawValue,
             rating: rating,
             year: year,
             description: description,
             director: director,
-            iconName: iconName
+            iconName: selectedGenre.iconName
         )
         
         movies.append(newMovie)
