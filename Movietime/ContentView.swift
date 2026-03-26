@@ -111,32 +111,43 @@ struct ContentView: View {
                 )
                 .ignoresSafeArea()
 
-                List(movies) { movie in
-                    NavigationLink {
-                        MovieDetailView(movie: movie)
-                    } label: {
-                        HStack {
-                            Image(systemName: movie.iconName)
-                                .font(.system(size: 24))
-                                .frame(width: 48)
-                                .foregroundStyle(.gray)
+                List {
+                    ForEach(movies){ movie in
+                        NavigationLink {
+                            MovieDetailView(movie: movie)
+                        } label: {
+                            HStack {
+                                Image(systemName: movie.iconName)
+                                    .font(.system(size: 24))
+                                    .frame(width: 48)
+                                    .foregroundStyle(.gray)
 
-                            VStack(alignment: .leading) {
-                                Text(movie.title)
-                                    .font(.headline)
-                                Text("\(movie.year)")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                VStack(alignment: .leading) {
+                                    Text(movie.title)
+                                        .font(.headline)
+                                    Text("\(movie.year)")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
                             }
                         }
+                        
                     }
+                    .onDelete(perform: deleteMovie)
+                    
                 }
+                
                 .scrollContentBackground(.hidden)
                 .background(.clear)
                 .navigationTitle("Movies")
             }
+        
         }
+        
     }
+    func deleteMovie(at offsets: IndexSet) {
+            movies.remove(atOffsets: offsets)
+        }
 }
 
 #Preview {
