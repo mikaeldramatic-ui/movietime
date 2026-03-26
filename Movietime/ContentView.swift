@@ -25,33 +25,105 @@ extension Double {
 }
 
 struct MovieDetailView: View {
-
+    
     let movie: Movie
-
+    
     var body: some View {
-        VStack(spacing: 20) {
-            Image("\(movie.iconName)")
-                .font(.system(size: 80))
-                .foregroundStyle(.blue)
-            Text(movie.title)
-                .font(.title)
-                .fontWeight(.bold)
-            Text(movie.year)
-                .font(.title3)
-                .foregroundStyle(.secondary)
-            Text(movie.genre)
-                .font(.title3)
-                .foregroundStyle(.secondary)
-            Text(movie.director)
-                .font(.title3)
-                .foregroundStyle(.secondary)
-            Text(movie.description)
-                .font(.title3)
-                .foregroundStyle(.secondary)
-            Text("Rating: \(movie.rating.oneDecimal)")
-                .font(.title3)
-                .foregroundStyle(.secondary)
+        ScrollView{
+            VStack(spacing: 24){
+                VStack(spacing: 12){
+                    Image(systemName: movie.iconName)
+                        .font(.system(size: 50))
+                        .foregroundStyle(.white)
+                        .frame(width: 120, height: 120)
+                        .background(
+                            Circle()
+                                .fill(LinearGradient(
+                                    colors: [.purple.opacity(0.3), .blue.opacity(0.3)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                        )
+                    Text(movie.title)
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(.white)
+                    
+                    HStack(spacing: 4){
+                        ForEach(0..<5) { index in
+                            Image(systemName: index < Int(movie.rating / 2) ? "star.fill" : "star")
+                                .foregroundStyle(.yellow)
+                        }
+                        Text(movie.rating.oneDecimal)
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                    }
+                }
+                HStack(spacing: 16){
+                    InfoCard(title: "Year", value: movie.year)
+                    InfoCard(title: "Genre", value: movie.genre)
+                }
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("Director", systemImage: "person.fill")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    Text(movie.director)
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+                
+                VStack(alignment: .leading, spacing: 8){
+                    Text("Plot")
+                        .font(.headline)
+                    Text(movie.description)
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+            }
+            .padding()
         }
+        .background(
+            LinearGradient(
+                colors: [
+                    Color(red: 0.5, green: 0.0, blue: 0.15),
+                    Color(red: 0.1, green: 0.05, blue: 0.2),
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+        )
+    }
+}
+
+struct InfoCard: View {
+    let title: String
+    let value: String
+    
+    var body: some View {
+        VStack(spacing: 4){
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.title3)
+                .fontWeight(.semibold)
+                .foregroundStyle(.primary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
     }
 }
 
