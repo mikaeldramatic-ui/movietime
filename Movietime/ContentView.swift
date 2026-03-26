@@ -25,7 +25,6 @@ extension Double {
 }
 
 enum Genre: String, CaseIterable, Identifiable {
-    case none = "Choose Genre"
     case action = "Action"
     case adventure = "Adventure"
     case comedy = "Comedy"
@@ -40,7 +39,6 @@ enum Genre: String, CaseIterable, Identifiable {
     
     var iconName: String {
         switch self {
-        case .none: return "questionmark.circle"
         case .action: return "bolt.fill"
         case .adventure: return "sailboat.fill"
         case .comedy: return "theatermasks.fill"
@@ -278,7 +276,7 @@ struct AddMovieView: View {
     @Binding var isPresented: Bool
     
     @State private var title = ""
-    @State private var selectedGenre: Genre = .none
+    @State private var selectedGenre: Genre? = nil
     @State private var rating: Double = 5.0
     @State private var year = ""
     @State private var description = ""
@@ -308,12 +306,12 @@ struct AddMovieView: View {
                 }
                 
                 Picker(selection: $selectedGenre) {
-                    ForEach(Genre.allCases.filter { $0 != .none }) { genreOption in
+                    ForEach(Genre.allCases) { genreOption in
                         HStack {
                             Image(systemName: genreOption.iconName)
                             Text(genreOption.rawValue)
                         }
-                        .tag(genreOption)
+                        .tag(Optional(genreOption))
                     }
                 } label: {
                     Text("Genre")
@@ -346,7 +344,7 @@ struct AddMovieView: View {
                     Button("Add") {
                         addMovie()
                     }
-                    .disabled(title.isEmpty || selectedGenre == .none || description.isEmpty)
+                    .disabled(title.isEmpty || selectedGenre == nil || description.isEmpty)
                 
                 }
             
@@ -355,14 +353,16 @@ struct AddMovieView: View {
         }
     }
     func addMovie() {
+        guard let genre = selectedGenre else { return }
+        
         let newMovie = Movie(
             title: title,
-            genre: selectedGenre.rawValue,
+            genre: genre.rawValue,
             rating: rating,
             year: year,
             description: description,
             director: director,
-            iconName: selectedGenre.iconName
+            iconName: genre.iconName
         )
         
         movies.append(newMovie)
