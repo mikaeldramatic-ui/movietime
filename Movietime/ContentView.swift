@@ -269,14 +269,17 @@ struct AddMovieView: View {
                 .ignoresSafeArea()
                 
                 Form {
-                Section("Movie Information") {
+                Section {
                     TextField("Title", text: $title)
                     TextField("Genre", text: $genre)
                     TextField("Year", text: $year)
                     TextField("Director", text: $director)
+                }  header: {
+                    Text("Movie Information")
+                        .foregroundStyle(.white)
                 }
                 
-                Section("Details") {
+                Section {
                     TextField("Description", text: $description, axis: .vertical)
                         .lineLimit(3...6)
                     
@@ -285,6 +288,9 @@ struct AddMovieView: View {
                         Slider(value: $rating, in: 0...10, step: 0.1)
                         Text(rating.oneDecimal)
                     }
+                }  header: {
+                    Text("Details")
+                        .foregroundStyle(.white)
                 }
             }
             .scrollContentBackground(.hidden)
