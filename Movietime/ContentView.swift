@@ -56,6 +56,16 @@ struct MovieDetailView: View {
 }
 
 struct ContentView: View {
+    
+    init() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    }
 
     @State private var movies = [
         Movie(
@@ -97,14 +107,15 @@ struct ContentView: View {
     @State private var newDescription = ""
     @State private var newDirector = ""
     @State private var newIconName = ""
+    @State private var showingAddMovieSheet = false
 
     var body: some View {
         NavigationStack {
             ZStack {
                 LinearGradient(
                     colors: [
-                        Color(red: 1.0, green: 0.95, blue: 0.9),
-                        Color(red: 0.95, green: 0.9, blue: 1.0),
+                        Color(red: 0.5, green: 0.0, blue: 0.15),
+                        Color(red: 0.1, green: 0.05, blue: 0.2),
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
@@ -131,23 +142,114 @@ struct ContentView: View {
                                 }
                             }
                         }
-                        
                     }
                     .onDelete(perform: deleteMovie)
-                    
                 }
-                
                 .scrollContentBackground(.hidden)
                 .background(.clear)
                 .navigationTitle("Movies")
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            showingAddMovieSheet = true
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                    }
+                }
+                .sheet(isPresented: $showingAddMovieSheet) {
+                    AddMovieView(
+                        movies: $movies,
+                        isPresented: $showingAddMovieSheet
+                    )
+                }
             }
-        
         }
-        
     }
     func deleteMovie(at offsets: IndexSet) {
             movies.remove(atOffsets: offsets)
         }
+}
+
+struct AddMovieView: View {
+    @Binding var movies: [Movie]
+    @Binding var isPresented: Bool
+    
+    @State private var title = ""
+    @State private var genre = ""
+    @State private var rating: Double = 5.0
+    @State private var year = ""
+    @State private var description = ""
+    @State private var director = ""
+    @State private var iconName = "film.fill"
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.5, green: 0.0, blue: 0.15),
+                        Color(red: 0.1, green: 0.05, blue: 0.2),
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+                
+                Form {
+                Section("Movie Information") {
+                    TextField("Title", text: $title)
+                    TextField("Genre", text: $genre)
+                    TextField("Year", text: $year)
+                    TextField("Director", text: $director)
+                }
+                
+                Section("Details") {
+                    TextField("Description", text: $description, axis: .vertical)
+                        .lineLimit(3...6)
+                    
+                    HStack {
+                        Text("Rating:")
+                        Slider(value: $rating, in: 0...10, step: 0.1)
+                        Text(rating.oneDecimal)
+                    }
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .navigationTitle("Add Movie")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        isPresented = false
+                    }
+                }
+                
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Add") {
+                        addMovie()
+                    }
+                    .disabled(title.isEmpty)
+                
+                }
+            
+            }
+            }
+        }
+    }
+    func addMovie() {
+        let newMovie = Movie(
+            title: title,
+            genre: genre,
+            rating: rating,
+            year: year,
+            description: description,
+            director: director,
+            iconName: iconName
+        )
+        
+        movies.append(newMovie)
+        isPresented = false
+    }
 }
 
 #Preview {
